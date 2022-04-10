@@ -20,11 +20,22 @@ class ProjectInput {
         this.attach();
     }
     harvestUserInput() {
-        return [
-            this.titleInputElement.value,
-            this.descriptionInputElement.value,
-            parseInt(this.peopleInputElement.value),
-        ];
+        const enteredTitleInput = new StringInput(this.titleInputElement.value, true, 5);
+        const enteredDescriptionInput = new StringInput(this.descriptionInputElement.value, true, 5);
+        const enteredPeopleInput = new NumberInput(this.peopleInputElement.value, true, 5);
+        if (enteredTitleInput.valid &&
+            enteredDescriptionInput.valid &&
+            enteredPeopleInput.valid) {
+            return [
+                enteredTitleInput.value,
+                enteredDescriptionInput.value,
+                enteredPeopleInput.value,
+            ];
+        }
+        else {
+            alert("Invalid input exists!");
+            return;
+        }
     }
     submitHandler(e) {
         e.preventDefault();
@@ -44,6 +55,49 @@ __decorate([
 __decorate([
     AutoBind
 ], ProjectInput.prototype, "submitHandler", null);
+class Input {
+    get valid() {
+        return this._valid;
+    }
+    set valid(value) {
+        this._valid = value;
+    }
+}
+class NumberInput extends Input {
+    constructor(value, required, min, max) {
+        super();
+        this.required = required;
+        this.min = min;
+        this.max = max;
+        this.value =
+            typeof value === "string" ? (this.value = parseInt(value)) : value;
+        this.validate();
+    }
+    validate() {
+        this.valid =
+            !(this.required && this.value.toString().trim().length === 0) &&
+                (this.min === undefined || this.min <= this.value) &&
+                (this.max === undefined || this.value <= this.max);
+    }
+}
+class StringInput extends Input {
+    constructor(value, required, minLength, maxLength) {
+        super();
+        this.value = value;
+        this.required = required;
+        this.minLength = minLength;
+        this.maxLength = maxLength;
+        this.validate();
+    }
+    validate() {
+        this.valid =
+            !(this.required && this.value.toString().trim().length === 0) &&
+                (this.minLength === undefined ||
+                    this.minLength <= this.value.length) &&
+                (this.maxLength === undefined ||
+                    this.value.length <= this.maxLength);
+    }
+}
 /**
  * Method decorator function sample.
  * Called right BEFORE every execution of target method.
